@@ -78,7 +78,9 @@ export abstract class BaseAttendanceProvider implements IAttendanceProvider {
                 '--no-first-run',
                 '--disable-background-timer-throttling',
                 '--disable-backgrounding-occluded-windows',
-                '--disable-renderer-backgrounding'
+                '--disable-renderer-backgrounding',
+                '--disable-web-security',
+                '--disable-features=VizDisplayCompositor'
             ],
 
         });

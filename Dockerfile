@@ -1,27 +1,11 @@
 FROM node:18-alpine
 
-# Install Chromium and essential dependencies for Puppeteer
+# Install minimal Chromium for Puppeteer
 RUN apk add --no-cache \
     chromium \
-    chromium-chromedriver \
     nss \
-    freetype \
-    harfbuzz \
     ca-certificates \
-    ttf-freefont \
-    libx11 \
-    libxcomposite \
-    libxdamage \
-    libxext \
-    libxfixes \
-    libxrandr \
-    libxrender \
-    libxtst \
-    cups \
-    dbus \
-    fontconfig \
-    fonts-liberation \
-    xdg-utils
+    ttf-freefont
 
 # Create a symlink for chromium and verify installation
 RUN ln -sf /usr/bin/chromium-browser /usr/bin/google-chrome && \
