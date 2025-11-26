@@ -80,7 +80,15 @@ export abstract class BaseAttendanceProvider implements IAttendanceProvider {
                 '--disable-backgrounding-occluded-windows',
                 '--disable-renderer-backgrounding',
                 '--disable-web-security',
-                '--disable-features=VizDisplayCompositor'
+                '--disable-features=VizDisplayCompositor',
+                '--disable-ipc-flooding-protection',
+                '--max_old_space_size=4096',
+                '--disable-extensions-except=/tmp',
+                '--disable-plugins-discovery',
+                '--no-default-browser-check',
+                '--no-pings',
+                '--password-store=basic',
+                '--use-mock-keychain'
             ],
 
         });

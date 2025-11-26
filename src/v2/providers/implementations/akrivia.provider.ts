@@ -217,11 +217,19 @@ export class AkriviaProvider extends BaseAttendanceProvider {
      */
     private async authenticateAndNavigate(credentials: LoginCredentials): Promise<void> {
         // Phase 1: Navigate to login page
-        console.log(`[${this.getName()}] Navigating to login page...`);
-        await this.page!.goto(this.config.loginUrl, {
-            waitUntil: 'networkidle0',
-            timeout: this.config.timeoutMs
-        });
+        console.log(`[${this.getName()}] Navigating to login page: ${this.config.loginUrl}`);
+        console.log(`[${this.getName()}] Using timeout: ${this.config.timeoutMs}ms`);
+
+        try {
+            await this.page!.goto(this.config.loginUrl, {
+                waitUntil: 'domcontentloaded', // Changed from networkidle0 to be less strict
+                timeout: this.config.timeoutMs
+            });
+            console.log(`[${this.getName()}] ✅ Successfully navigated to login page`);
+        } catch (error) {
+            console.log(`[${this.getName()}] ❌ Navigation failed:`, error instanceof Error ? error.message : String(error));
+            throw error;
+        }
 
         // Phase 2: Enter credentials
         console.log(`[${this.getName()}] Entering credentials...`);
