@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { USERS_FILE_PATH } from '../config/constants';
+import { DATA_CONFIG } from '../config/constants';
 import { User } from '../models/user.model';
 
 /**
@@ -12,7 +12,7 @@ export async function ensureFileExists(): Promise<void> {
     try {
         // Check if file exists
         try {
-            await fs.access(USERS_FILE_PATH);
+            await fs.access(DATA_CONFIG.USERS_FILE);
             // File exists, do nothing
             return;
         } catch {
@@ -20,11 +20,11 @@ export async function ensureFileExists(): Promise<void> {
         }
 
         // Ensure parent directory exists
-        const dirPath = path.dirname(USERS_FILE_PATH);
+        const dirPath = path.dirname(DATA_CONFIG.USERS_FILE);
         await fs.mkdir(dirPath, { recursive: true });
 
         // Create file with empty array
-        await fs.writeFile(USERS_FILE_PATH, '[]', 'utf8');
+        await fs.writeFile(DATA_CONFIG.USERS_FILE, '[]', 'utf8');
     } catch (error) {
         throw new Error(`Failed to ensure file exists: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -41,7 +41,7 @@ export async function readUsersFromFile(): Promise<User[]> {
         await ensureFileExists();
 
         // Read file content
-        const fileContent = await fs.readFile(USERS_FILE_PATH, 'utf8');
+        const fileContent = await fs.readFile(DATA_CONFIG.USERS_FILE, 'utf8');
 
         // Parse JSON
         const users = JSON.parse(fileContent);
@@ -69,18 +69,18 @@ export async function readUsersFromFile(): Promise<User[]> {
 export async function writeUsersToFile(users: User[]): Promise<void> {
     try {
         // Ensure directory exists
-        const dirPath = path.dirname(USERS_FILE_PATH);
+        const dirPath = path.dirname(DATA_CONFIG.USERS_FILE);
         await fs.mkdir(dirPath, { recursive: true });
 
         // Convert to JSON with pretty formatting
         const jsonContent = JSON.stringify(users, null, 2);
 
         // Atomic write: write to temp file first
-        const tempFilePath = `${USERS_FILE_PATH}.tmp`;
+        const tempFilePath = `${DATA_CONFIG.USERS_FILE}.tmp`;
         await fs.writeFile(tempFilePath, jsonContent, 'utf8');
 
         // Rename temp file to actual file (atomic operation)
-        await fs.rename(tempFilePath, USERS_FILE_PATH);
+        await fs.rename(tempFilePath, DATA_CONFIG.USERS_FILE);
     } catch (error) {
         throw new Error(`Failed to write users: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }

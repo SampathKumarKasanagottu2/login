@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  attendance-app:
+    build: .
+    ports:
+      - "7889:7889"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - NODE_ENV=production
+      - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7889"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

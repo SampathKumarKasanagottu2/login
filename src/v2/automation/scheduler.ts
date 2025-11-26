@@ -30,6 +30,21 @@ export function startScheduler(): void {
         return;
     }
 
+    // Check if running in GitHub Actions or other cloud scheduler
+    const isCloudScheduler = process.env.GITHUB_ACTIONS === 'true' ||
+                           process.env.CLOUD_SCHEDULER === 'true';
+
+    if (isCloudScheduler) {
+        console.log('\n========================================');
+        console.log('[Scheduler] Running in cloud scheduler mode');
+        console.log('[Scheduler] Executing attendance automation once...');
+        console.log('========================================\n');
+
+        // Run automation once and exit
+        runAttendanceAutomationOnce();
+        return;
+    }
+
     // Check if already running
     if (scheduledTask) {
         console.log('[Scheduler] Scheduler is already running');
@@ -69,10 +84,40 @@ export function startScheduler(): void {
 }
 
 /**
+ * Runs attendance automation once (for cloud schedulers)
+ * This function executes the attendance queue processing immediately
+ * and then exits, suitable for GitHub Actions or other cloud schedulers
+ *
+ * @returns {Promise<void>}
+ */
+async function runAttendanceAutomationOnce(): Promise<void> {
+    try {
+        // Try to acquire the lock
+        if (!acquireLock('cron')) {
+            console.log('[Cloud Scheduler] Skipping execution - attendance processing already in progress');
+            return;
+        }
+
+        console.log('[Cloud Scheduler] Starting attendance automation execution...');
+
+        // Process the attendance queue
+        await processAttendanceQueue();
+
+        console.log('[Cloud Scheduler] ✓ Attendance automation execution completed');
+
+    } catch (error) {
+        console.error('[Cloud Scheduler] Error during attendance automation:', error);
+    } finally {
+        // Always release the lock
+        releaseLock();
+    }
+}
+
+/**
  * Stop the attendance automation scheduler
- * 
+ *
  * Gracefully stops the running cron job.
- * 
+ *
  * @returns {void}
  */
 export function stopScheduler(): void {

@@ -9,7 +9,11 @@
     "build": "tsc && npm run copy:public",
     "copy:public": "node copy-public.mjs",
     "dev:v2": "tsx src/v2/index.ts",
-    "start:v2": "node dist/v2/index.js"
+    "start:v2": "node dist/v2/index.js",
+    "generate-keys": "node generate-keys.js",
+    "docker:build": "docker build -t attendance-app .",
+    "docker:run": "docker run -p 7889:7889 -v $(pwd)/data:/app/data attendance-app",
+    "deploy:check": "bash deploy.sh"
   },
   "keywords": [],
   "author": "",
@@ -19,15 +23,15 @@
     "is-reachable": "^5.2.1",
     "minimist": "^1.2.8",
     "node-cron": "^3.0.2",
-    "node-windows": "1.0.0-beta.8",
     "puppeteer": "^19.11.1",
-    "zx": "^8.8.5"
+    "zx": "^8.8.5",
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.20",
     "@types/minimist": "^1.2.5",
+    "@types/node": "^20.10.0",
     "@types/node-cron": "^3.0.10",
-    "@types/node-windows": "^0.1.5",
     "@types/puppeteer": "^7.0.4",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"

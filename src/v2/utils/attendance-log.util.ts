@@ -7,7 +7,7 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import { ATTENDANCE_LOGS_PATH } from '../config/constants';
+import { DATA_CONFIG } from '../config/constants';
 import { AttendanceLog } from '../models/attendance.model';
 
 /**
@@ -25,10 +25,10 @@ const MAX_LOGS = 1000;
 export async function ensureAttendanceLogFileExists(): Promise<void> {
     try {
         // Check if file exists
-        await fs.access(ATTENDANCE_LOGS_PATH);
+        await fs.access(DATA_CONFIG.ATTENDANCE_LOGS_FILE);
     } catch (error) {
         // File doesn't exist, create it
-        const dir = path.dirname(ATTENDANCE_LOGS_PATH);
+        const dir = path.dirname(DATA_CONFIG.ATTENDANCE_LOGS_FILE);
 
         // Create directory if it doesn't exist
         try {
@@ -38,8 +38,8 @@ export async function ensureAttendanceLogFileExists(): Promise<void> {
         }
 
         // Create file with empty array
-        await fs.writeFile(ATTENDANCE_LOGS_PATH, '[]', 'utf-8');
-        console.log(`✓ Created attendance logs file: ${ATTENDANCE_LOGS_PATH}`);
+        await fs.writeFile(DATA_CONFIG.ATTENDANCE_LOGS_FILE, '[]', 'utf-8');
+        console.log(`✓ Created attendance logs file: ${DATA_CONFIG.ATTENDANCE_LOGS_FILE}`);
     }
 }
 
@@ -54,13 +54,13 @@ export async function readLogsFromFile(): Promise<AttendanceLog[]> {
         // Ensure file exists before reading
         await ensureAttendanceLogFileExists();
 
-        const data = await fs.readFile(ATTENDANCE_LOGS_PATH, 'utf-8');
+        const data = await fs.readFile(DATA_CONFIG.ATTENDANCE_LOGS_FILE, 'utf-8');
         const logs = JSON.parse(data);
 
         // Validate that it's an array
         if (!Array.isArray(logs)) {
             console.error('Attendance logs file is not an array, recreating...');
-            await fs.writeFile(ATTENDANCE_LOGS_PATH, '[]', 'utf-8');
+            await fs.writeFile(DATA_CONFIG.ATTENDANCE_LOGS_FILE, '[]', 'utf-8');
             return [];
         }
 
@@ -69,7 +69,7 @@ export async function readLogsFromFile(): Promise<AttendanceLog[]> {
         if (error instanceof SyntaxError) {
             // JSON parse error - file is corrupted
             console.error('Attendance logs file is corrupted, recreating...');
-            await fs.writeFile(ATTENDANCE_LOGS_PATH, '[]', 'utf-8');
+            await fs.writeFile(DATA_CONFIG.ATTENDANCE_LOGS_FILE, '[]', 'utf-8');
             return [];
         }
         throw new Error(`Failed to read attendance logs: ${error}`);
@@ -85,11 +85,11 @@ export async function readLogsFromFile(): Promise<AttendanceLog[]> {
  * @throws {Error} If file write fails
  */
 export async function writeLogsToFile(logs: AttendanceLog[]): Promise<void> {
-    const tempPath = `${ATTENDANCE_LOGS_PATH}.tmp`;
+    const tempPath = `${DATA_CONFIG.ATTENDANCE_LOGS_FILE}.tmp`;
 
     try {
         // Ensure directory exists
-        const dir = path.dirname(ATTENDANCE_LOGS_PATH);
+        const dir = path.dirname(DATA_CONFIG.ATTENDANCE_LOGS_FILE);
         await fs.mkdir(dir, { recursive: true });
 
         // Write to temporary file with pretty formatting
@@ -97,7 +97,7 @@ export async function writeLogsToFile(logs: AttendanceLog[]): Promise<void> {
         await fs.writeFile(tempPath, jsonData, 'utf-8');
 
         // Atomic rename (replaces old file)
-        await fs.rename(tempPath, ATTENDANCE_LOGS_PATH);
+        await fs.rename(tempPath, DATA_CONFIG.ATTENDANCE_LOGS_FILE);
     } catch (error) {
         // Clean up temp file if it exists
         try {
