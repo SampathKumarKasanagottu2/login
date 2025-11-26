@@ -1,14 +1,49 @@
 FROM node:18-alpine
 
-# Install Chromium for Puppeteer
+# Install Chromium and dependencies for Puppeteer
 RUN apk add --no-cache \
     chromium \
+    chromium-chromedriver \
     nss \
     freetype \
     freetype-dev \
     harfbuzz \
     ca-certificates \
-    ttf-freefont
+    ttf-freefont \
+    libx11 \
+    libxcomposite \
+    libxdamage \
+    libxext \
+    libxfixes \
+    libxrandr \
+    libxrender \
+    libxtst \
+    cups \
+    dbus \
+    gconf-service \
+    gtk+3.0 \
+    libasound2 \
+    libatk1.0 \
+    libcairo-gobject2 \
+    libgtk-3-0 \
+    libnspr4 \
+    libpango-1.0 \
+    libxss1 \
+    fonts-liberation \
+    lsb-release \
+    xdg-utils
+
+# Create a symlink for chromium
+RUN ln -sf /usr/bin/chromium-browser /usr/bin/google-chrome || \
+    ln -sf /usr/bin/chromium /usr/bin/google-chrome || \
+    echo "Chromium binary not found at expected locations"
+
+# Verify chromium installation
+RUN echo "Chromium version:" && chromium --version || echo "Chromium not found"
+
+# Set Puppeteer to use installed Chromium
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 # Create app directory
 WORKDIR /app

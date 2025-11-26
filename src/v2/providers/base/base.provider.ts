@@ -56,18 +56,30 @@ export abstract class BaseAttendanceProvider implements IAttendanceProvider {
      */
     async initialize(): Promise<void> {
         // Determine Chrome executable path based on OS
-        const chromePath = process.platform === 'darwin'
+        // Use environment variable if set, otherwise try to find chrome
+        const chromePath = process.env.PUPPETEER_EXECUTABLE_PATH ||
+            (process.platform === 'darwin'
             ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
             : process.platform === 'win32'
                 ? 'C:/Program Files/Google/Chrome/Application/chrome.exe'
-                : '/usr/bin/google-chrome'; // Linux
+                : '/usr/bin/chromium-browser'); // Linux - use chromium-browser as fallback
 
         console.log(`[${this.getName()}] Initializing browser...`);
+        console.log(`[${this.getName()}] Using Chrome path: ${chromePath}`);
 
         this.browser = await puppeteer.launch({
-            headless: this.config.headless,
+            headless: this.config.headless ? "new" : false, // Use new headless mode
             executablePath: chromePath,
-            args: ['--no-sandbox', '--disable-setuid-sandbox',],
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-gpu',
+                '--no-first-run',
+                '--disable-background-timer-throttling',
+                '--disable-backgrounding-occluded-windows',
+                '--disable-renderer-backgrounding'
+            ],
 
         });
 
