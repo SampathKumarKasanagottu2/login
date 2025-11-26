@@ -1,7 +1,28 @@
-import { fs } from "zx";
+import fs from 'fs';
+import path from 'path';
 
-// Ensure the destination directory exists (mkdirp handles existing dirs)
-await fs.mkdirp("dist/v2/public");
+// Ensure the destination directory exists
+const destDir = 'dist/v2/public';
+if (!fs.existsSync(destDir)) {
+  fs.mkdirSync(destDir, { recursive: true });
+}
 
 // Copy public files recursively
-await fs.copy("src/v2/public", "dist/v2/public", { recursive: true, overwrite: true });
+function copyDir(src, dest) {
+  const entries = fs.readdirSync(src, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      if (!fs.existsSync(destPath)) {
+        fs.mkdirSync(destPath, { recursive: true });
+      }
+      copyDir(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
+copyDir('src/v2/public', destDir);
+console.log('Public files copied successfully');

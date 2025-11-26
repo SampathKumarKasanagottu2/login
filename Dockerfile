@@ -26,7 +26,14 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Clean and build the application
-RUN rm -rf dist && pnpm run build
+RUN rm -rf dist && \
+    echo "Building TypeScript..." && \
+    npx tsc && \
+    echo "TypeScript build complete" && \
+    echo "Copying public files..." && \
+    node copy-public.mjs && \
+    echo "Build complete" && \
+    ls -la dist/v2/
 
 # Create data directory
 RUN mkdir -p /app/data
