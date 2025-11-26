@@ -15,7 +15,7 @@ import { ProviderConfig } from '../base/provider.interface';
 export const AKRIVIA_CONFIG: ProviderConfig = {
     name: 'Akrivia HCM',
     loginUrl: 'https://keus.akriviahcm.com/login?returnUrl=%2Fdashboard%2Fdashboard',
-    timeoutMs: 60000, // Increased to 60 seconds for cloud environments
+    timeoutMs: 120000, // Increased to 120 seconds for cloud environments
     headless: true,   // Set to false for debugging
     retryAttempts: 3
 };
