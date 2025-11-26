@@ -25,8 +25,8 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Build the application
-RUN pnpm run build
+# Clean and build the application
+RUN rm -rf dist && pnpm run build
 
 # Create data directory
 RUN mkdir -p /app/data
